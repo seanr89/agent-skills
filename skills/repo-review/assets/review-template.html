@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Repo Review</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --surface: #ffffff; --text: #1b1f24; --muted: #5b6573; --border: #d9dee5;
+    --accent: #2457d6; --accent-text: #ffffff; --done: #2f7d4f;
+    --p0: #b3261e; --p1: #c25b00; --p2: #8a6d00; --p3: #4b5563;
+    --code-bg: #eef1f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151a; --surface: #1b2027; --text: #e6e9ee; --muted: #9aa5b4; --border: #2e3641;
+      --accent: #7ba2ff; --accent-text: #0d1220; --done: #62c28a;
+      --p0: #ff8a80; --p1: #ffb066; --p2: #e6c85a; --p3: #aab4c3;
+      --code-bg: #12161c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { margin: 0; font-size: 24px; }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .progress { margin: 16px 0; }
+  .bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bar > div { height: 100%; width: 0; background: var(--done); transition: width .2s; }
+  .progress-label { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .toolbar { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 12px 0; border-bottom: 1px solid var(--border); display: grid; gap: 10px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .row .label { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); min-width: 64px; }
+  input[type=search], select { font: inherit; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); }
+  input[type=search] { flex: 1 1 260px; }
+  button { font: inherit; font-size: 13px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button[aria-pressed=true] { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  button.action { border-radius: 6px; }
+  button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .count { opacity: .75; margin-left: 4px; }
+  .result-count { font-size: 13px; color: var(--muted); margin: 14px 0 8px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-left-width: 4px; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
+  .card[data-p="P0"] { border-left-color: var(--p0); }
+  .card[data-p="P1"] { border-left-color: var(--p1); }
+  .card[data-p="P2"] { border-left-color: var(--p2); }
+  .card[data-p="P3"] { border-left-color: var(--p3); }
+  .card.done { opacity: .6; }
+  .card.done .title { text-decoration: line-through; }
+  .head { display: flex; gap: 12px; align-items: flex-start; }
+  .head input[type=checkbox] { width: 18px; height: 18px; margin-top: 3px; flex: none; accent-color: var(--done); }
+  .main { flex: 1; min-width: 0; }
+  .title { font-weight: 600; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; font-size: 12px; }
+  .tag { padding: 1px 8px; border: 1px solid var(--border); border-radius: 999px; color: var(--muted); }
+  .tag.pri { font-weight: 700; }
+  .tag.pri[data-p="P0"] { color: var(--p0); border-color: var(--p0); }
+  .tag.pri[data-p="P1"] { color: var(--p1); border-color: var(--p1); }
+  .tag.pri[data-p="P2"] { color: var(--p2); border-color: var(--p2); }
+  .tag.pri[data-p="P3"] { color: var(--p3); border-color: var(--p3); }
+  .loc { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+  details { margin-top: 8px; }
+  summary { cursor: pointer; font-size: 13px; color: var(--accent); }
+  .body h4 { margin: 12px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .body p { margin: 0; white-space: pre-wrap; }
+  pre { margin: 0; padding: 10px; background: var(--code-bg); border-radius: 6px; overflow-x: auto; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+  mark { background: color-mix(in srgb, var(--accent) 30%, transparent); color: inherit; border-radius: 2px; }
+  .empty { text-align: center; color: var(--muted); padding: 40px 0; }
+  @media (max-width: 520px) { .row .label { min-width: 100%; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="title">Repo Review</h1>
+  <div class="meta" id="meta"></div>
+
+  <div class="progress">
+    <div class="bar" role="progressbar" aria-label="Findings done" aria-valuemin="0" aria-valuemax="100" id="bar"><div></div></div>
+    <div class="progress-label" id="progress-label"></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="row">
+      <input type="search" id="q" placeholder="Search title, file, description, evidence…  ( / to focus )" aria-label="Search findings">
+      <select id="sort" aria-label="Sort by">
+        <option value="priority">Sort: priority</option>
+        <option value="category">Sort: category</option>
+        <option value="file">Sort: file</option>
+        <option value="effort">Sort: effort (quick wins first)</option>
+      </select>
+    </div>
+    <div class="row"><span class="label">Category</span><span id="f-category" class="row"></span></div>
+    <div class="row"><span class="label">Priority</span><span id="f-priority" class="row"></span></div>
+    <div class="row"><span class="label">Effort</span><span id="f-effort" class="row"></span></div>
+    <div class="row"><span class="label">Status</span><span id="f-status" class="row"></span>
+      <span style="flex:1"></span>
+      <button class="action" id="mark-visible">Mark visible done</button>
+      <button class="action" id="unmark-visible">Unmark visible</button>
+      <button class="action" id="reset-filters">Clear filters</button>
+    </div>
+  </div>
+
+  <div class="result-count" id="result-count" aria-live="polite"></div>
+  <div id="list"></div>
+</div>
+
+<script id="review-data" type="application/json">__REVIEW_DATA__</script>
+<script>
+(function () {
+  "use strict";
+  var DATA = JSON.parse(document.getElementById("review-data").textContent);
+  var CATEGORIES = ["security", "bug", "performance", "tech-debt", "feature"];
+  var CATEGORY_LABEL = { security: "Security", bug: "Bug", performance: "Performance", "tech-debt": "Tech debt", feature: "Feature" };
+  var PRIORITIES = ["P0", "P1", "P2", "P3"];
+  var PRIORITY_LABEL = { P0: "P0 critical", P1: "P1 high", P2: "P2 medium", P3: "P3 low" };
+  var EFFORTS = ["S", "M", "L"];
+  var STATUSES = [["all", "All"], ["open", "Open"], ["done", "Done"]];
+
+  var findings = DATA.findings;
+  var storageKey = "repo-review:" + DATA.repo;
+  var done = loadDone();
+  var openDetails = {};
+  var filters = { q: "", category: {}, priority: {}, effort: {}, status: "all", sort: "priority" };
+
+  findings.forEach(function (f) {
+    f._hay = [f.id, f.title, f.file, f.description, f.evidence, f.recommendation, f.category, f.priority].join("\n").toLowerCase();
+  });
+
+  // ---- persistence (localStorage may be unavailable; fall back to memory) ----
+  function loadDone() {
+    try {
+      var arr = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      var set = {};
+      arr.forEach(function (id) { set[id] = true; });
+      return set;
+    } catch (e) { return {}; }
+  }
+  function saveDone() {
+    try { localStorage.setItem(storageKey, JSON.stringify(Object.keys(done))); } catch (e) { /* in-memory only */ }
+  }
+
+  // ---- helpers ----
+  function el(tag, props, children) {
+    var node = document.createElement(tag);
+    Object.keys(props || {}).forEach(function (k) {
+      if (k === "text") node.textContent = props[k];
+      else if (k === "class") node.className = props[k];
+      else if (k.indexOf("data-") === 0 || k.indexOf("aria-") === 0) node.setAttribute(k, props[k]);
+      else node[k] = props[k];
+    });
+    (children || []).forEach(function (c) { if (c) node.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return node;
+  }
+  function terms() { return filters.q.toLowerCase().split(/\s+/).filter(Boolean); }
+  function highlight(text, ts) {
+    if (!ts.length) return [text];
+    var lower = text.toLowerCase(), ranges = [];
+    ts.forEach(function (t) {
+      var i = lower.indexOf(t);
+      while (i !== -1) { ranges.push([i, i + t.length]); i = lower.indexOf(t, i + t.length); }
+    });
+    if (!ranges.length) return [text];
+    ranges.sort(function (a, b) { return a[0] - b[0]; });
+    var merged = [ranges[0]];
+    ranges.slice(1).forEach(function (r) {
+      var last = merged[merged.length - 1];
+      if (r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else merged.push(r);
+    });
+    var out = [], pos = 0;
+    merged.forEach(function (r) {
+      if (r[0] > pos) out.push(text.slice(pos, r[0]));
+      out.push(el("mark", { text: text.slice(r[0], r[1]) }));
+      pos = r[1];
+    });
+    if (pos < text.length) out.push(text.slice(pos));
+    return out;
+  }
+  function anySelected(map) { return Object.keys(map).some(function (k) { return map[k]; }); }
+
+  // ---- filtering and sorting ----
+  function visibleFindings() {
+    var ts = terms();
+    var rank = function (list, v) { return list.indexOf(v); };
+    var out = findings.filter(function (f) {
+      if (anySelected(filters.category) && !filters.category[f.category]) return false;
+      if (anySelected(filters.priority) && !filters.priority[f.priority]) return false;
+      if (anySelected(filters.effort) && !filters.effort[f.effort]) return false;
+      if (filters.status === "open" && done[f.id]) return false;
+      if (filters.status === "done" && !done[f.id]) return false;
+      return ts.every(function (t) { return f._hay.indexOf(t) !== -1; });
+    });
+    out.sort(function (a, b) {
+      var byP = rank(PRIORITIES, a.priority) - rank(PRIORITIES, b.priority);
+      var byC = rank(CATEGORIES, a.category) - rank(CATEGORIES, b.category);
+      var byE = rank(EFFORTS, a.effort) - rank(EFFORTS, b.effort);
+      var byF = a.file.localeCompare(b.file) || (a.line || 0) - (b.line || 0);
+      var order = { priority: [byP, byE, byC], category: [byC, byP, byE], file: [byF, byP], effort: [byE, byP, byC] }[filters.sort];
+      for (var i = 0; i < order.length; i++) if (order[i]) return order[i];
+      return a.title.localeCompare(b.title);
+    });
+    return out;
+  }
+
+  // ---- rendering ----
+  function renderChips(containerId, values, labels, key) {
+    var box = document.getElementById(containerId);
+    box.textContent = "";
+    values.forEach(function (v) {
+      var n = findings.filter(function (f) { return f[key] === v; }).length;
+      if (!n) return;
+      var b = el("button", { type: "button", "aria-pressed": String(!!filters[key][v]) }, [
+        labels ? labels[v] : v, el("span", { class: "count", text: String(n) })
+      ]);
+      b.addEventListener("click", function () { filters[key][v] = !filters[key][v]; render(); });
+      box.appendChild(b);
+    });
+  }
+  function renderStatus() {
+    var box = document.getElementById("f-status");
+    box.textContent = "";
+    STATUSES.forEach(function (s) {
+      var b = el("button", { type: "button", text: s[1], "aria-pressed": String(filters.status === s[0]) });
+      b.addEventListener("click", function () { filters.status = s[0]; render(); });
+      box.appendChild(b);
+    });
+  }
+  function renderProgress() {
+    var total = findings.length;
+    var n = findings.filter(function (f) { return done[f.id]; }).length;
+    var pct = total ? Math.round((n / total) * 100) : 0;
+    document.querySelector("#bar > div").style.width = pct + "%";
+    document.getElementById("bar").setAttribute("aria-valuenow", String(pct));
+    var open0 = findings.filter(function (f) { return !done[f.id] && f.priority === "P0"; }).length;
+    document.getElementById("progress-label").textContent =
+      n + " of " + total + " done (" + pct + "%)" + (open0 ? " · " + open0 + " P0 still open" : "");
+  }
+  function renderCard(f, ts) {
+    var isDone = !!done[f.id];
+    var cb = el("input", { type: "checkbox", checked: isDone, "aria-label": "Mark done: " + f.title });
+    cb.addEventListener("change", function () {
+      if (cb.checked) done[f.id] = true; else delete done[f.id];
+      saveDone();
+      render();
+    });
+    var loc = f.file + (f.line ? ":" + f.line : "");
+    var tags = el("div", { class: "tags" }, [
+      el("span", { class: "tag pri", "data-p": f.priority, text: PRIORITY_LABEL[f.priority] }),
+      el("span", { class: "tag", text: CATEGORY_LABEL[f.category] }),
+      el("span", { class: "tag", text: "Effort " + f.effort })
+    ]);
+    var details = el("details", {}, [
+      el("summary", { text: "Details" }),
+      el("div", { class: "body" }, [
+        el("h4", { text: "What and why" }), el("p", {}, highlight(f.description, ts)),
+        el("h4", { text: "Evidence" }), el("pre", {}, highlight(f.evidence, ts)),
+        el("h4", { text: "Recommendation" }), el("p", {}, highlight(f.recommendation, ts))
+      ])
+    ]);
+    var bodyText = (f.description + f.evidence + f.recommendation).toLowerCase();
+    details.open = !!openDetails[f.id] || ts.some(function (t) { return bodyText.indexOf(t) !== -1; });
+    details.addEventListener("toggle", function () { openDetails[f.id] = details.open; });
+    return el("article", { class: "card" + (isDone ? " done" : ""), "data-p": f.priority }, [
+      el("div", { class: "head" }, [
+        cb,
+        el("div", { class: "main" }, [
+          el("div", { class: "title" }, highlight(f.title, ts)),
+          el("div", { class: "loc" }, highlight(loc, ts)),
+          tags, details
+        ])
+      ])
+    ]);
+  }
+  function render() {
+    renderChips("f-category", CATEGORIES, CATEGORY_LABEL, "category");
+    renderChips("f-priority", PRIORITIES, PRIORITY_LABEL, "priority");
+    renderChips("f-effort", EFFORTS, null, "effort");
+    renderStatus();
+    renderProgress();
+    var ts = terms();
+    var list = visibleFindings();
+    var box = document.getElementById("list");
+    box.textContent = "";
+    list.forEach(function (f) { box.appendChild(renderCard(f, ts)); });
+    if (!list.length) box.appendChild(el("div", { class: "empty", text: "No findings match the current filters." }));
+    document.getElementById("result-count").textContent = "Showing " + list.length + " of " + findings.length + " findings";
+  }
+
+  // ---- wiring ----
+  var q = document.getElementById("q");
+  q.addEventListener("input", function () { filters.q = q.value; render(); });
+  document.getElementById("sort").addEventListener("change", function (e) { filters.sort = e.target.value; render(); });
+  document.getElementById("reset-filters").addEventListener("click", function () {
+    filters = { q: "", category: {}, priority: {}, effort: {}, status: "all", sort: filters.sort };
+    q.value = "";
+    render();
+  });
+  function setVisible(value) {
+    visibleFindings().forEach(function (f) { if (value) done[f.id] = true; else delete done[f.id]; });
+    saveDone();
+    render();
+  }
+  document.getElementById("mark-visible").addEventListener("click", function () { setVisible(true); });
+  document.getElementById("unmark-visible").addEventListener("click", function () { setVisible(false); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "/" && document.activeElement !== q && !/input|select|textarea/i.test(document.activeElement.tagName)) {
+      e.preventDefault();
+      q.focus();
+    }
+  });
+
+  document.title = "Review: " + DATA.repo;
+  document.getElementById("title").textContent = "Review: " + DATA.repo;
+  document.getElementById("meta").textContent =
+    [DATA.branch, DATA.commit, new Date(DATA.generated).toLocaleString()].filter(Boolean).join(" · ") +
+    " · checkbox state is saved in this browser";
+  render();
+})();
+</script>
+</body>
+</html>
