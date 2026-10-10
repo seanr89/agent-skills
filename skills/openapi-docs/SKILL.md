@@ -59,28 +59,38 @@ In `src/app.js`, before the 404 handler, add:
 
 Keep Express code in `app.js`. `src/openapi.js` stays free of Express.
 
-Done when: the server starts and `/openapi.json` and `/api-docs/` both respond 200 (checked in step 8).
+Done when: the server starts and `/openapi.json` and `/api-docs/` both respond 200 (checked in step 9).
 
-## 7. Test
+## 7. Export the spec
+
+The committed export is `docs/openapi.json`: JSON, the same format `/openapi.json` serves. Never edit it by hand.
+- `scripts/export-openapi.js` writes it from `src/openapi.js`. With `--check` it exits 1 when the file is missing or stale.
+- `package.json` scripts: `openapi:export` runs the script, `openapi:check` runs it with `--check`.
+- Create the script, the two npm scripts, and the export if any is missing, then run `npm run openapi:export`.
+
+Done when: `npm run openapi:check` exits 0.
+
+## 8. Test
 
 Add `tests/openapi.test.js` using the `freshApp` helper:
 - the spec passes `SwaggerParser.validate`
 - `GET /openapi.json` returns 200 with `openapi` set to `3.0.3`
 - the spec's `paths` include `/api/locations`, `/api/locations/{id}`, `/api/offers`, and `/api/offers/{id}`
 - `GET /api-docs/` returns 200
+- `docs/openapi.json` equals the serialized spec, so a stale export fails the suite
 
 Done when: `npm test` passes with the new file included.
 
-## 8. Verify
+## 9. Verify
 
-Run `npm test`. Then run `npm start` in the background, `curl` `/openapi.json` and `/api-docs/`, and stop the server.
+Run `npm run openapi:export`, then `npm test`. Then run `npm start` in the background, `curl` `/openapi.json` and `/api-docs/`, and stop the server.
 
-Done when: tests pass and both URLs return 200.
+Done when: `npm run openapi:check` exits 0, tests pass, and both URLs return 200.
 
 ## Refreshing
 
-To refresh after route or validation changes, re-run from step 1. Step 1 re-surveys the routes, so only annotations for changed routes should move. Leave annotations that still match the code alone.
+To refresh after route or validation changes, re-run from step 1. Step 1 re-surveys the routes, so only annotations for changed routes should move. Step 7 then regenerates `docs/openapi.json`. Leave annotations that still match the code alone.
 
 ## Report
 
-End with: files changed, packages added, the test result, and any route or function left without docs and why.
+End with: files changed (including whether `docs/openapi.json` changed), packages added, the test result, and any route or function left without docs and why.
