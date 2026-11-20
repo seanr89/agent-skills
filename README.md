@@ -7,6 +7,7 @@ A collection of [Agent Skills](https://docs.claude.com/en/docs/claude-code/skill
 | Skill | Use it to | Invocation |
 |---|---|---|
 | [`dependency-security-update`](skills/dependency-security-update/SKILL.md) | Audit and update vulnerable or outdated dependencies in Node.js (npm, yarn, pnpm) and .NET (NuGet) repos, using Snyk when available. Fixes in risk-ordered tiers, verifies after each. | Automatic |
+| [`gdpr-privacy-ui`](skills/gdpr-privacy-ui/SKILL.md) | Design or build GDPR-facing UI: cookie banner, preferences modal, "Privacy choices" link, a Privacy & Data dashboard (rectification, data export, consent history, account deletion), and opt-in checkboxes on forms. Produces component hierarchy, markup, WCAG 2.1 AA notes, server contracts, and open questions for legal. Engineering guidance, not legal advice. | Automatic |
 | [`github-pull-requests`](skills/github-pull-requests/SKILL.md) | Create PRs with one fixed description template and post reviews in one fixed shape, via the `gh` CLI. | Automatic |
 | [`openapi-docs`](skills/openapi-docs/SKILL.md) | Add or refresh OpenAPI docs, JSDoc comments, and swagger packages. **Written for one specific Express API** (`src/routes/*.js`, `Location`/`Offer` schemas); adapt it before using it on another project. | Manual only (`/openapi-docs`) |
 | [`repo-review`](skills/repo-review/SKILL.md) | Scan a whole repo for security, bug, performance, tech-debt and feature findings and write a filterable `review.html` backlog. Needs Node.js to build the report. | Automatic |
@@ -109,7 +110,7 @@ Upload availability depends on your plan; check Anthropic's current docs.
 | `github-pull-requests` | The [`gh` CLI](https://cli.github.com/), authenticated (`gh auth login`). |
 | `openapi-docs` | An Express API laid out as the skill describes, plus `npm`. |
 | `repo-review` | Node.js, to run `scripts/build-review.mjs`. |
-| `updating-repo-docs`, `writing-unit-tests` | Nothing extra. |
+| `gdpr-privacy-ui`, `updating-repo-docs`, `writing-unit-tests` | Nothing extra. |
 
 ## Contributing
 
